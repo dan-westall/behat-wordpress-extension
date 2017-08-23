@@ -39,4 +39,4 @@ install:
 
 test_script:
   - cd c:\projects\behat
-  - php bin\behat --tags="~@javascript" --format=progress
+  - php vendor\bin\behat --tags="~@javascript" --format=progress
