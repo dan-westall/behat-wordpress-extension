@@ -18,7 +18,7 @@ cache:
 
 init:
   - ps:
-  - SET PATH=c:\php;%PATH%
+  - SET PATH=%systemroot%\system32\inetsrv\;C:\Program Files\OpenSSL;c:\tools\php;%PATH%
   - SET COMPOSER_NO_INTERACTION=1
   - SET PHP=1
   - SET ANSICON=121x90 (121x90)
@@ -29,7 +29,6 @@ install:
   - IF EXIST c:\tools\php (SET PHP=0)
   - IF %PHP%==1 cinst -y OpenSSL.Light
   - IF %PHP%==1 cinst -y php --allow-empty-checksums --version 7.0.9
-  - SET PATH=%systemroot%\system32\inetsrv\;C:\Program Files\OpenSSL;%PATH%
   - cd c:\tools\php
   - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
   - appveyor DownloadFile https://getcomposer.org/composer.phar
@@ -40,8 +39,6 @@ install:
   - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini
   - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini
   - IF %PHP%==1 echo extension=php_curl.dll >> php.ini
-  - dir
-  - type composer.bat
 
   # Install WordHat.
   - cd c:\projects\behat
