@@ -39,5 +39,4 @@ install:
 
 test_script:
   - cd c:\projects\behat
-  - dir
   - vendor\bin\behat --tags="~@javascript" --format=progress
