@@ -1,19 +1,22 @@
-version: '{build}'
+version: '{branch}.{build}'
 platform: x86
 clone_folder: c:\projects\behat
 build: off
+skip_tags: true
 
-environment:
-  PHP_DOWNLOAD_FILE: php-5.6.31-nts-Win32-VC11-x86.zip
+services:
+  - mysql
+  - iis
 
 branches:
-  only:
-    - master
+  except:
+    - gh-pages
 
 cache:
-  - c:\php -> appveyor.yml
+  - c:\tools\php -> appveyor.yml
 
 init:
+  - ps:
   - SET PATH=c:\php;%PATH%
   - SET COMPOSER_NO_INTERACTION=1
   - SET PHP=1
@@ -21,21 +24,53 @@ init:
   - git config --global core.autocrlf input
 
 install:
-  - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
-  - cd c:\php
-  - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/%PHP_DOWNLOAD_FILE%
-  - IF %PHP%==1 7z x %PHP_DOWNLOAD_FILE% -y > 7z.log
+  # OpenSSL and PHP.
+  - IF EXIST c:\tools\php (SET PHP=0)
+  - IF %PHP%==1 cinst -y OpenSSL.Light
+  - IF %PHP%==1 cinst -y --allow-empty-checksums php -version 7.0.9
+  - IF %PHP%==1 mkdir c:\tools\php
+  - SET PATH=C:\Program Files\OpenSSL;%PATH%
+  - cd c:\tools\php
+  - IF %PHP%==1 copy php.ini-production php.ini /Y
+  - IF %PHP%==1 echo date.timezone="UTC" >> php.ini
+  - IF %PHP%==1 echo extension_dir=ext >> php.ini
+  - IF %PHP%==1 echo extension=php_openssl.dll >> php.ini
+  - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini
+  - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini
+  - IF %PHP%==1 echo extension=php_curl.dll >> php.ini
+
+  # Composer.
   - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
   - appveyor DownloadFile https://getcomposer.org/composer.phar
-  - copy php.ini-production php.ini /Y
-  - echo date.timezone="UTC" >> php.ini
-  - echo extension_dir=ext >> php.ini
-  - echo extension=php_openssl.dll >> php.ini
-  - echo extension=php_curl.dll >> php.ini
-  - echo extension=php_mbstring.dll >> php.ini
-  - echo extension=php_fileinfo.dll >> php.ini
   - cd c:\projects\behat
-  - composer install --no-progress --ansi
+  - composer install --no-interaction --prefer-dist --no-progress
+
+  # WordPress.
+  - mkdir c:\projects\wordpress
+  - vendor\bin\wp core download --force --version=latest --path=c:\projects\wordpress
+  - del c:\projects\wordpress\wp-config.php
+  - vendor\bin\wp core config --path=c:\projects\wordpress --dbname=wordpress --dbuser=root --dbpass=Password12 --dbhost=127.0.0.1
+  - vendor\bin\wp db create --path=c:\projects\wordpress
+  - vendor\bin\wp core install --path=c:\projects\wordpress --url="wordpress.dev" --title="wordpress.dev" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com"
+
+  # IIS.
+  - NET START W3SVC
+  - choco install -y urlrewrite
+  - powershell -command "New-WebSite -Name 'WordPress' -PhysicalPath 'c:\projects\wordpress' -Force"
+  - echo 127.0.0.1 wordpress.dev >> %WINDIR%\System32\Drivers\Etc\Hosts
+  - powershell -command "Import-Module WebAdministration; Set-ItemProperty 'IIS:\Sites\WordPress' -name Bindings -value @{protocol='http';bindingInformation='*:80:wordpress.dev'}"
+  - SET PATH=%systemroot%\system32\inetsrv\;%PATH%
+
+  # FastCGI.
+  - appcmd set config -section:anonymousAuthentication /username:"" --password
+  - appcmd set config /section:system.webServer/fastCGI /+[fullPath='C:\tools\php\php-cgi.exe']
+  - appcmd set config /section:system.webServer/handlers /+[name='PHP-FastCGI',path='*.php',verb='*',modules='FastCgiModule',scriptProcessor='C:\tools\php\php-cgi.exe',resourceType='Either']
+
+  - iisreset
+  - NET START W3SVC
+
+  # Check it works.
+  - powershell -command "wget http://www.mysite.com/"
 
 test_script:
   - cd c:\projects\behat
