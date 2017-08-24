@@ -28,7 +28,7 @@ install:
   # OpenSSL and PHP.
   - IF EXIST c:\tools\php (SET PHP=0)
   - IF %PHP%==1 cinst -y OpenSSL.Light
-  - IF %PHP%==1 cinst -y php --version 7.0.9
+  - IF %PHP%==1 cinst -y php --allow-empty-checksums --version 7.0.9
   - SET PATH=%systemroot%\system32\inetsrv\;C:\Program Files\OpenSSL;%PATH%
   - cd c:\tools\php
   - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
