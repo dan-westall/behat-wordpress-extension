@@ -49,10 +49,11 @@ install:
   # Download WordPress.
   - mkdir c:\projects\wordpress
   - vendor\bin\wp core download --force --version=latest --path=c:\projects\wordpress
+  - echo 127.0.0.1 localhost >> %WINDIR%\System32\Drivers\Etc\Hosts
+  - echo 127.0.0.1 wordpress.dev >> %WINDIR%\System32\Drivers\Etc\Hosts
 
 test_script:
   # Install WordPress (MySQL service starts after `install`).
-  - type %WINDIR%\System32\Drivers\Etc\Hosts
   - vendor\bin\wp core config --path=c:\projects\wordpress --dbname=wordpress --dbuser=root --dbpass=Password12 --dbhost=127.0.0.1
   - vendor\bin\wp db create --path=c:\projects\wordpress
   - vendor\bin\wp core install --path=c:\projects\wordpress --url="wordpress.dev" --title="wordpress.dev" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com"
@@ -61,7 +62,6 @@ test_script:
   - NET START W3SVC
   - choco install -y urlrewrite
   - powershell -command "New-WebSite -Name 'WordPress' -PhysicalPath 'c:\projects\wordpress' -Force"
-  - echo 127.0.0.1 wordpress.dev >> %WINDIR%\System32\Drivers\Etc\Hosts
   - powershell -command "Import-Module WebAdministration; Set-ItemProperty 'IIS:\Sites\WordPress' -name Bindings -value @{protocol='http';bindingInformation='*:80:wordpress.dev'}"
 
   # FastCGI.
