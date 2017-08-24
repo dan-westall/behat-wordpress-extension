@@ -30,6 +30,7 @@ install:
   - IF %PHP%==1 cinst -y --allow-empty-checksums php --version 7.0.9
   - IF %PHP%==1 cinst -y composer
   - SET PATH=C:\Program Files\OpenSSL;%PATH%
+  - powershell refreshenv
   - cd c:\tools\php
   - IF %PHP%==1 copy php.ini-production php.ini /Y
   - IF %PHP%==1 echo date.timezone="UTC" >> php.ini
@@ -39,8 +40,7 @@ install:
   - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini
   - IF %PHP%==1 echo extension=php_curl.dll >> php.ini
 
-  # Composer.
-  - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
+  # Install WordHat.
   - cd c:\projects\behat
   - composer install --no-interaction --prefer-dist --no-progress
 
