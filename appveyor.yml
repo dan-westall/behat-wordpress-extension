@@ -59,6 +59,7 @@ test_script:
   - choco install -y urlrewrite
   - powershell -command "New-WebSite -Name 'WordPress' -PhysicalPath 'c:\projects\wordpress' -Force"
   - echo 127.0.0.1 wordpress.dev >> %WINDIR%\System32\Drivers\Etc\Hosts
+  - type %WINDIR%\System32\Drivers\Etc\Hosts
   - powershell -command "Import-Module WebAdministration; Set-ItemProperty 'IIS:\Sites\WordPress' -name Bindings -value @{protocol='http';bindingInformation='*:80:wordpress.dev'}"
 
   # FastCGI.
