@@ -54,7 +54,7 @@ install:
 
 test_script:
   # Install WordPress (MySQL service starts after `install`).
-  - vendor\bin\wp core config --path=c:\projects\wordpress --dbname=wordpress --dbuser=root --dbpass=Password12 --dbhost=127.0.0.1
+  - vendor\bin\wp core config --path=c:\projects\wordpress --dbname=wordpress --dbuser=root --dbpass=Password12! --dbhost=127.0.0.1
   - vendor\bin\wp db create --path=c:\projects\wordpress
   - vendor\bin\wp core install --path=c:\projects\wordpress --url="wordpress.dev" --title="wordpress.dev" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com"
 
