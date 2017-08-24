@@ -14,6 +14,7 @@ branches:
 
 cache:
   - c:\tools\php -> appveyor.yml
+  - '%LOCALAPPDATA%\Composer\files'
 
 init:
   - ps:
@@ -27,11 +28,11 @@ install:
   # OpenSSL and PHP.
   - IF EXIST c:\tools\php (SET PHP=0)
   - IF %PHP%==1 cinst -y OpenSSL.Light
-  - IF %PHP%==1 cinst -y --allow-empty-checksums php --version 7.0.9
-  - IF %PHP%==1 cinst -y composer
-  - SET PATH=C:\Program Files\OpenSSL;%PATH%
-  - powershell refreshenv
+  - IF %PHP%==1 cinst -y php --version 7.0.9
+  - SET PATH=%systemroot%\system32\inetsrv\;C:\Program Files\OpenSSL;%PATH%
   - cd c:\tools\php
+  - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
+  - appveyor DownloadFile https://getcomposer.org/composer.phar
   - IF %PHP%==1 copy php.ini-production php.ini /Y
   - IF %PHP%==1 echo date.timezone="UTC" >> php.ini
   - IF %PHP%==1 echo extension_dir=ext >> php.ini
@@ -39,6 +40,8 @@ install:
   - IF %PHP%==1 echo extension=php_mbstring.dll >> php.ini
   - IF %PHP%==1 echo extension=php_fileinfo.dll >> php.ini
   - IF %PHP%==1 echo extension=php_curl.dll >> php.ini
+  - dir
+  - type composer.bat
 
   # Install WordHat.
   - cd c:\projects\behat
@@ -58,7 +61,6 @@ install:
   - powershell -command "New-WebSite -Name 'WordPress' -PhysicalPath 'c:\projects\wordpress' -Force"
   - echo 127.0.0.1 wordpress.dev >> %WINDIR%\System32\Drivers\Etc\Hosts
   - powershell -command "Import-Module WebAdministration; Set-ItemProperty 'IIS:\Sites\WordPress' -name Bindings -value @{protocol='http';bindingInformation='*:80:wordpress.dev'}"
-  - SET PATH=%systemroot%\system32\inetsrv\;%PATH%
 
   # FastCGI.
   - appcmd set config -section:anonymousAuthentication /username:"" --password
@@ -69,7 +71,7 @@ install:
   - NET START W3SVC
 
   # Check it works.
-  - powershell -command "wget http://www.mysite.com/"
+  - powershell -command "wget http://wordpress.dev"
 
 test_script:
   - cd c:\projects\behat
