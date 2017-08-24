@@ -61,7 +61,7 @@ class WpcliDriver extends BaseDriver
 
         // Support Windows.
         if ($binary === null && DIRECTORY_SEPARATOR === '\\') {
-            $this->binary = 'vendor\bin/wp.bat';
+            $this->binary = 'vendor\bin\wp.bat';
         } elseif ($binary !== null) {
             $this->binary = $binary;
         }
