@@ -18,7 +18,7 @@ cache:
 
 init:
   - ps:
-  - SET PATH=%systemroot%\system32\inetsrv\;C:\Program Files\OpenSSL;c:\tools\php;%PATH%
+  - SET PATH=%systemroot%\system32\inetsrv\;C:\Program Files\OpenSSL;c:\tools\php;C:\Program Files\MySQL\MySQL Server 5.7\bin;%PATH%
   - SET COMPOSER_NO_INTERACTION=1
   - SET PHP=1
   - SET ANSICON=121x90 (121x90)
