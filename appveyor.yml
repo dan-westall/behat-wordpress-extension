@@ -62,7 +62,6 @@ test_script:
   # IIS.
   - choco install -y urlrewrite
   - powershell -command "New-WebSite -Name 'WordPress' -PhysicalPath 'c:\projects\wordpress' -HostHeader 'wordpress.dev' -Force"
-  - powershell -command "Import-Module WebAdministration; New-WebBinding -Name 'WordPress' -HostHeader 'wordpress.dev' -Force"
 
   # FastCGI.
   - appcmd set config -section:anonymousAuthentication /username:"" --password
