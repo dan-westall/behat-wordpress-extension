@@ -60,7 +60,6 @@ test_script:
   - vendor\bin\wp core install --path=c:\projects\wordpress --url="wordpress.dev" --title="wordpress.dev" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com"
 
   # IIS.
-  - NET START W3SVC
   - choco install -y urlrewrite
   - powershell -command "New-WebSite -Name 'WordPress' -PhysicalPath 'c:\projects\wordpress' -Force"
   - powershell -command "Import-Module WebAdministration; Set-ItemProperty 'IIS:\Sites\WordPress' -name Bindings -value @{protocol='http';bindingInformation='*:80:wordpress.dev'}"
@@ -70,7 +69,6 @@ test_script:
   - appcmd set config /section:system.webServer/fastCGI /+[fullPath='C:\tools\php\php-cgi.exe']
   - appcmd set config /section:system.webServer/handlers /+[name='PHP-FastCGI',path='*.php',verb='*',modules='FastCgiModule',scriptProcessor='C:\tools\php\php-cgi.exe',resourceType='Either']
   - iisreset
-  - NET START W3SVC
 
   # Check it works.
   - powershell -command "wget http://wordpress.dev"
