@@ -61,14 +61,16 @@ test_script:
 
   # IIS.
   - choco install -y urlrewrite
-  - powershell -command "New-WebSite -Name 'WordPress' -PhysicalPath 'c:\projects\wordpress' -Force"
-  - powershell -command "Import-Module WebAdministration; Set-ItemProperty 'IIS:\Sites\WordPress' -name Bindings -value @{protocol='http';bindingInformation='*:80:wordpress.dev'}"
+  - powershell -command "New-WebSite -Name 'WordPress' -PhysicalPath 'c:\projects\wordpress' -HostHeader 'http://wordpress.dev' -Force"
+  - powershell -command "Import-Module WebAdministration; New-WebBinding -Name 'WordPress' -HostHeader 'http://wordpress.dev' -Force"
 
   # FastCGI.
   - appcmd set config -section:anonymousAuthentication /username:"" --password
   - appcmd set config /section:system.webServer/fastCGI /+[fullPath='C:\tools\php\php-cgi.exe']
   - appcmd set config /section:system.webServer/handlers /+[name='PHP-FastCGI',path='*.php',verb='*',modules='FastCgiModule',scriptProcessor='C:\tools\php\php-cgi.exe',resourceType='Either']
+
   - iisreset
+  - powershell -command "Start-WebSite WordPress"
 
   # Check it works.
   - powershell -command "wget http://wordpress.dev"
