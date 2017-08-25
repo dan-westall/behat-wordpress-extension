@@ -68,10 +68,8 @@ test_script:
   - appcmd set config /section:system.webServer/fastCGI /+[fullPath='C:\tools\php\php-cgi.exe']
   - appcmd set config /section:system.webServer/handlers /+[name='PHP-FastCGI',path='*.php',verb='*',modules='FastCgiModule',scriptProcessor='C:\tools\php\php-cgi.exe',resourceType='Either']
 
-  - iisreset
-  - powershell -command "Start-WebSite WordPress"
-
   # Check it works.
+  - iisreset
   - powershell -command "wget http://wordpress.dev"
   #- cd c:\projects\behat
   #- vendor\bin\behat --tags="~@javascript" --format=progress --config bin\travis\behat.yml
