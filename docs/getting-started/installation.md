@@ -25,6 +25,10 @@ cd project</code></pre>
 </li>
 
 <li>Edit your <code>behat.yml</code> and update the <code>base_url</code> setting with the URL of the website that you intend to test.
+     <div class="admonition tip">
+        <p class="admonition-title">Tip</p>
+        <p>You can also declare a WP CLI alais at this point if you have a more exotic install configuration</p>
+    </div>
 </li>
 
 <li>Initialise <a href="http://behat.org">Behat</a>:
